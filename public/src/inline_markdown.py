@@ -23,8 +23,34 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
 
 
 def extract_markdown_images(text):
-    return re.findall("!\[(.*?)\]\((.*?)\)", text)
+    return re.findall(r"!\[(.*?)\]\((.*?)\)", text)
 
 
-def extract_mardown_links(text):
-    return re.findall("\[(.*?)\]\((.*?)\)", text)
+def extract_markdown_links(text):
+    return re.findall(r"\[(.*?)\]\((.*?)\)", text)
+
+def split_nodes_image(old_nodes):
+    nodes = []
+    for node in old_nodes:
+        images = extract_markdown_images(node.text)
+        for image_tup in images:
+            one = node.text.split(f"![{image_tup[0]}]({image_tup[1]})", 1)
+            if len(one[0]) is not 0:
+                nodes.append(TextNode(one[0], "text"))
+            nodes.append(TextNode(image_tup[0], "image", image_tup[1]))
+            if len(one) > 0 and len(one[1]) is not 0 and not (r"!\[(.*?)\]\((.*?)\)") in one[1]:
+                nodes.append(TextNode(one[1], "text"))
+    return nodes
+
+def split_nodes_link(old_nodes):
+    nodes = []
+    for node in old_nodes:
+        links = extract_markdown_links(node.text)
+        for link_tup in links:
+            one = node.text.split(f"![{link_tup[0]}]({link_tup[1]})", 1)
+            if len(one[0]) is not 0:
+                nodes.append(TextNode(one[0], "text"))
+            nodes.append(TextNode(link_tup[0], "link", link_tup[1]))
+            if len(one[1]) is not 0 and not (r"!\[(.*?)\]\((.*?)\)") in one[1]:
+                nodes.append(TextNode(one[1], "text"))
+    return nodes

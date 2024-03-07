@@ -1,10 +1,12 @@
 import unittest
-from inline_markdown import (
-    extract_mardown_links,
-    extract_markdown_images,
-    split_nodes_delimiter,
-)
 
+from inline_markdown import (
+    extract_markdown_images,
+    extract_markdown_links,
+    split_nodes_delimiter,
+    split_nodes_image,
+    split_nodes_link,
+)
 from textnode import TextNode
 
 
@@ -84,13 +86,45 @@ class TestInlineMarkdown(unittest.TestCase):
 
     def test_extract_links(self):
         text = "This is text with a [link](https://www.example.com) and [another](https://www.example.com/another)"
-        links = extract_mardown_links(text)
+        links = extract_markdown_links(text)
         self.assertEqual(
             [
                 ("link", "https://www.example.com"),
                 ("another", "https://www.example.com/another"),
             ],
             links,
+        )
+
+    def test_split_images(self):
+        node = TextNode(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png)",
+            "text",
+        )
+        new_nodes = split_nodes_image([node])
+        self.assertEqual(
+            [
+                TextNode("This is text with an ", "text"),
+                TextNode("image", "image", "https://i.imgur.com/zjjcJKZ.png"),
+                TextNode(" and another ", "text"),
+                TextNode("second image", "image", "https://i.imgur.com/3elNhQu.png"),
+            ],
+            new_nodes,
+        )
+
+    def test_split_links(self):
+        node = TextNode(
+            "This is text with a [link](https://www.example.com) and [another](https://www.example.com/another)",
+            "text",
+        )
+        new_nodes = split_nodes_link([node])
+        self.assertEqual(
+            [
+                TextNode("This is a text with a ", "text"),
+                TextNode("link", "link", "https://www.example.com"),
+                TextNode(" and ", "text"),
+                TextNode("another", "link", "https://www.example.com/another"),
+            ],
+            new_nodes,
         )
 
 
