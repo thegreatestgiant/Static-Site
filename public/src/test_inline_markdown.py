@@ -119,7 +119,7 @@ class TestInlineMarkdown(unittest.TestCase):
         new_nodes = split_nodes_link([node])
         self.assertEqual(
             [
-                TextNode("This is a text with a ", "text"),
+                TextNode("This is text with a ", "text"),
                 TextNode("link", "link", "https://www.example.com"),
                 TextNode(" and ", "text"),
                 TextNode("another", "link", "https://www.example.com/another"),

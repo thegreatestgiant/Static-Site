@@ -1,11 +1,12 @@
-from textnode import TextNode
 import re
+
+from textnode import TextNode
 
 
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
     nodes = []
     for node in old_nodes:
-        if node.text_type is not "text":
+        if node.text_type != "text":
             nodes.append(node)
             continue
         divided = node.text.split(delimiter)
@@ -34,32 +35,22 @@ def split_nodes_image(old_nodes):
     nodes = []
     for node in old_nodes:
         images = extract_markdown_images(node.text)
-        nodes.extend(recur(node.text, images, "image"))
-        # for image_tup in images:
-        #     one = node.text.split(f"![{image_tup[0]}]({image_tup[1]})", 1)
-        #     if len(one[0]) is not 0:
-        #         nodes.append(TextNode(one[0], "text"))
-        #     nodes.append(TextNode(image_tup[0], "image", image_tup[1]))
-        #     if len(one) > 0 and len(one[1]) is not 0 and not (r"!\[(.*?)\]\((.*?)\)") in one[1]:
-        #         nodes.append(TextNode(one[1], "text"))
-    return nodes
-
-
-def recur(text, tup_arr, type):
-    txt, nodes, i = True, [], 0
-    arr = text.split(r"!\[(.*?)\]\((.*?)\)")
-    for str in arr:
-        if len(str) is None:
-            continue
-        if txt:
-            txt = False
-            nodes.append(TextNode(str, "text"))
-        else:
-            txt = True
-            if i >= len(tup_arr):
+        first, nodes, i = True, [], 0
+        arr = re.split(r"!\[(.*?)\]\((.*?)\)", node.text)
+        for str in arr:
+            if len(str) == 0:
                 continue
-            nodes.append(TextNode(tup_arr[i][0], type, tup_arr[i][1]))
-            i += 1
+            if any(str in subl for subl in images):
+                if not first:
+                    first = True
+                    continue
+                first = False
+                if i >= len(images):
+                    continue
+                nodes.append(TextNode(images[i][0], "image", images[i][1]))
+                i += 1
+            else:
+                nodes.append(TextNode(str, "text"))
     return nodes
 
 
@@ -67,11 +58,20 @@ def split_nodes_link(old_nodes):
     nodes = []
     for node in old_nodes:
         links = extract_markdown_links(node.text)
-        for link_tup in links:
-            one = node.text.split(f"![{link_tup[0]}]({link_tup[1]})", 1)
-            if len(one[0]) is not 0:
-                nodes.append(TextNode(one[0], "text"))
-            nodes.append(TextNode(link_tup[0], "link", link_tup[1]))
-            if len(one[1]) is not 0 and not (r"!\[(.*?)\]\((.*?)\)") in one[1]:
-                nodes.append(TextNode(one[1], "text"))
+        nodes, i, first = [], 0, True
+        arr = re.split(r"\[(.*?)\]\((.*?)\)", node.text)
+        for str in arr:
+            if len(str) == 0:
+                continue
+            if any(str in subl for subl in links):
+                if not first:
+                    first = True
+                    continue
+                if i >= len(links):
+                    continue
+                nodes.append(TextNode(links[i][0], "link", links[i][1]))
+                i += 1
+                first = False
+            else:
+                nodes.append(TextNode(str, "text"))
     return nodes
