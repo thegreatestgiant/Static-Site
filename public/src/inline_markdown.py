@@ -91,3 +91,12 @@ def text_to_textnode(text):
     nodes = split_nodes_delimiter(nodes, "**", "bold")
     nodes = split_nodes_delimiter(nodes, "*", "italic")
     return nodes
+
+
+def markdown_to_blocks(markdown):
+    arr, blocks = markdown.split("\n\n"), []
+    for block in arr:
+        if block == "":
+            continue
+        blocks.append(block.strip())
+    return blocks
