@@ -14,10 +14,7 @@ def block_to_block_type(block: str):
     # Code
     if block.startswith("```") and block.endswith("```"):
         return "code"
-    lines = block.splitlines()
-    firsts = []
-    for line in lines:
-        firsts.append(line.split()[0])
+    firsts = [line.split()[0] for line in block.splitlines()]
     if all(x == firsts[0] for x in firsts):
         if ">" in firsts:
             return "quote"
