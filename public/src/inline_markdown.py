@@ -3,6 +3,16 @@ import re
 from textnode import TextNode
 
 
+def text_to_textnode(text):
+    nodes = [TextNode(text, "text")]
+    nodes = split_nodes_delimiter(nodes, "`", "code")
+    nodes = split_nodes_delimiter(nodes, "**", "bold")
+    nodes = split_nodes_delimiter(nodes, "*", "italic")
+    nodes = split_nodes_image(nodes)
+    nodes = split_nodes_link(nodes)
+    return nodes
+
+
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
     nodes = []
     for node in old_nodes:
@@ -39,6 +49,9 @@ def split_nodes_image(old_nodes):
             continue
         images = extract_markdown_images(node.text)
         first, i = True, 0
+        if len(images) == 0:
+            nodes.append(node)
+            continue
         arr = re.split(r"!\[(.*?)\]\((.*?)\)", node.text)
         for str in arr:
             if len(str) == 0:
@@ -64,6 +77,9 @@ def split_nodes_link(old_nodes):
             nodes.append(node)
             continue
         links = extract_markdown_links(node.text)
+        if len(links) == 0:
+            nodes.append(node)
+            continue
         first, i = True, 0
         arr = re.split(r"\[(.*?)\]\((.*?)\)", node.text)
         for str in arr:
@@ -80,14 +96,4 @@ def split_nodes_link(old_nodes):
                 first = False
             else:
                 nodes.append(TextNode(str, "text"))
-    return nodes
-
-
-def text_to_textnode(text):
-    nodes = [TextNode(text, "text")]
-    nodes = split_nodes_image(nodes)
-    nodes = split_nodes_link(nodes)
-    nodes = split_nodes_delimiter(nodes, "`", "code")
-    nodes = split_nodes_delimiter(nodes, "**", "bold")
-    nodes = split_nodes_delimiter(nodes, "*", "italic")
     return nodes

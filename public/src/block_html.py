@@ -15,6 +15,8 @@ def markdown_to_html_node(markdown):
 
 
 def inline_children(text):
+    text = text.splitlines()
+    text = " ".join(text)
     nodes = text_to_textnode(text)
     children = []
     for node in nodes:
@@ -29,7 +31,12 @@ def paragraph_to_html(block):
 
 
 def quote_to_html(block):
-    children = inline_children(block)
+    lines = block.splitlines()
+    for i in range(len(lines)):
+        if lines[i].startswith(">"):
+            lines[i] = lines[i].lstrip("> ")
+    lines = " ".join(lines)
+    children = inline_children(lines)
     return ParentNode("blockquote", children)
 
 
@@ -44,6 +51,7 @@ def unordered_list_to_html(block: str):
     lines = block.splitlines()
     items = []
     for line in lines:
+        line = line.partition(" ")[2]
         children = inline_children(line)
         item = ParentNode("li", children)
         items.append(item)
@@ -55,6 +63,7 @@ def ordered_list_to_html(block: str):
     lines = block.splitlines()
     items = []
     for line in lines:
+        line = line.partition(" ")[2]
         children = inline_children(line)
         item = ParentNode("li", children)
         items.append(item)

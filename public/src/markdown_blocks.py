@@ -6,6 +6,7 @@ def markdown_to_blocks(markdown):
         blocks.append(block.strip())
     return blocks
 
+
 def block_to_block_type(block: str):
     first = block.split(" ")[0]
     # Heading
@@ -14,7 +15,7 @@ def block_to_block_type(block: str):
     # Code
     if block.startswith("```") and block.endswith("```"):
         return "code"
-    firsts = [line.split()[0] for line in block.splitlines()]
+    firsts = [line.split(" ")[0] for line in block.splitlines()]
     if all(x == firsts[0] for x in firsts):
         if ">" in firsts:
             return "quote"
@@ -22,9 +23,8 @@ def block_to_block_type(block: str):
             return "unordered_list"
     works = True
     for i in range(len(firsts)):
-        if f"{i + 1}" not in firsts[i]:
+        if not f"{i + 1}." == firsts[i]:
             works = False
     if works:
         return "ordered_list"
     return "paragraph"
-
