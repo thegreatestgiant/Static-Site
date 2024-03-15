@@ -1,23 +1,19 @@
-from os.path import isdir, isfile
-import os, shutil
+import os
+import shutil
 
+from copystatic import copy_files_recursive
 
-def d_to_d(dir1, dir2):
-    if not os.path.exists(dir1) or not os.path.exists(dir2):
-        raise Exception("Enter a valid path")
-    shutil.rmtree(dir2)
-    os.mkdir(dir2, 0o755)
-    dirs = os.listdir(dir1)
-    for obj in dirs:
-        path = dir1 + obj
-        if os.path.isdir(path):
-            d_to_d(dir, dir2)
-        if os.path.isfile(path):
-            shutil.copy(path, dir2)
+dir_path_static = "./static"
+dir_path_public = "./public"
 
 
 def main():
-    d_to_d("/home/sean/Static Site/static/", "/home/sean/Static Site/public/")
+    print("Deleting public directory...")
+    if os.path.exists(dir_path_public):
+        shutil.rmtree(dir_path_public)
+
+    print("Copying static files to public directory...")
+    copy_files_recursive(dir_path_static, dir_path_public)
 
 
 main()
