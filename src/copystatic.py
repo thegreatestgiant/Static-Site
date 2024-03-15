@@ -1,4 +1,7 @@
 import os
+from pathlib import Path
+from os.path import isfile
+from re import template
 import shutil
 
 from block_html import markdown_to_html_node
@@ -31,18 +34,32 @@ def generate_page(from_path, template_path, dest_path):
     f = open(from_path)
     md = f.read()
     f.close()
+
     temp = open(template_path)
     template = temp.read()
     temp.close()
+
     node = markdown_to_html_node(md)
     content = node.to_html()
     title = extract_title(md)
+
     template = template.replace("{{ Title }}", title)
     template = template.replace("{{ Content }}", content)
+
+    dest_dir_path = os.path.dirname(dest_path)
+    if dest_dir_path != "":
+        os.makedirs(dest_dir_path, exist_ok=True)
     f = open(dest_path, "w")
     f.write(template)
     f.close()
 
 
 def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
-    pass
+    for filename in os.listdir(dir_path_content):
+        from_dir = os.path.join(dir_path_content, filename)
+        dest_dir = os.path.join(dest_dir_path, filename)
+        if os.path.isfile(from_dir):
+            dest_dir = Path(dest_dir).with_suffix(".html")
+            generate_page(from_dir, template_path, dest_dir)
+        else:
+            generate_pages_recursive(from_dir, template_path, dest_dir)
