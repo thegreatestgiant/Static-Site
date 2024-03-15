@@ -1,11 +1,23 @@
-from textnode import TextNode
+from os.path import isdir, isfile
+import os, shutil
+
+
+def d_to_d(dir1, dir2):
+    if not os.path.exists(dir1) or not os.path.exists(dir2):
+        raise Exception("Enter a valid path")
+    shutil.rmtree(dir2)
+    os.mkdir(dir2, 0o755)
+    dirs = os.listdir(dir1)
+    for obj in dirs:
+        path = dir1 + obj
+        if os.path.isdir(path):
+            d_to_d(dir, dir2)
+        if os.path.isfile(path):
+            shutil.copy(path, dir2)
 
 
 def main():
-    node1 = TextNode("This is a text node", "bold", "https://boot.dev")
-    node2 = TextNode("This is a text node", "bold", "https://boot.dev")
-    print(node1 == node2)
-    print(node1)
+    d_to_d("/home/sean/Static Site/static/", "/home/sean/Static Site/public/")
 
 
 main()
