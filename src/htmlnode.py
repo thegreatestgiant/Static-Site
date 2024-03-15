@@ -45,8 +45,7 @@ class ParentNode(HTMLNode):
             raise ValueError("You need to enter a value")
         if self.children is None:
             raise ValueError("Where are your children?")
-        str = f"<{self.tag}>"
+        children_html = ""
         for child in self.children:
-            str += child.to_html()
-        str += f"</{self.tag}>"
-        return str
+            children_html += child.to_html()
+        return f"<{self.tag}{self.props_to_html()}>{children_html}</{self.tag}>"

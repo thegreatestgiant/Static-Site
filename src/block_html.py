@@ -43,7 +43,7 @@ def quote_to_html(block):
 def code_to_html(block):
     children = inline_children(block)
     code = ParentNode("code", children)
-    pre = ParentNode("pre", code)
+    pre = ParentNode("pre", [code])
     return pre
 
 
